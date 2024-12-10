@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Address Book</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+
+      input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      li {
+        list-style: none;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Add Number</h1>
+      <form id="form">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="text" id="number" placeholder="Phone Number" required />
+        <button type="submit">Add Contact</button>
+      </form>
+      <ul id="list"></ul>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("form");
+        const list = document.getElementById("list");
+
+        function addNumber(event) {
+          event.preventDefault();
+          const name = document.getElementById("name").value.trim();
+          const number = document.getElementById("number").value.trim();
+          
+          if (name !== "" && number !== "") {
+            const contacts = searchNumber();
+            contacts.push({ name, number });
+            saveNumber(contacts);
+            contact();
+            form.reset();
+          }
+        }
+
+        contact();
+
+        form.addEventListener("submit", addNumber);
+      });
+
+      function contact() {
+        const contacts = searchNumber();
+        list.innerHTML = "";
+        contacts.forEach((contact, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+                <strong>Name:</strong> ${contact.name}<br>
+                <strong>number:</strong> ${contact.number}<br>
+                <button onclick="updateNumber(${index})">Edit</button>
+                <button onclick="deleteNumber(${index})">Delete</button>`;
+          list.appendChild(li);
+        });
+      }
+
+      function searchNumber() {
+        return JSON.parse(localStorage.getItem("contacts")) || [];
+      }
+
+      function saveNumber(contacts) {
+        localStorage.setItem("contacts", JSON.stringify(contacts));
+      }
+
+      function updateNumber(index) {
+        const contacts = searchNumber();
+        const updatedName = prompt("Enter updated name:", contacts[index].name);
+        const updatedNumber = prompt("Enter updated number:",contacts[index].number);
+
+        if (updatedName !== null && updatedNumber !== null) {
+          contacts[index] = {
+            name: updatedName,
+            number: updatedNumber,
+          };
+          saveNumber(contacts);
+          contact();
+        }
+      }
+
+      function deleteNumber(index) {
+        const contacts = searchNumber();
+        contacts.splice(index, 1);
+        saveNumber(contacts);
+        contact();
+      }
+    </script>
+  </body>
+</html>
